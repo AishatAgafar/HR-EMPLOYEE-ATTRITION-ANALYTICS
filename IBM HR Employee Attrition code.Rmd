@@ -1,0 +1,256 @@
+---
+title: "IBM HR Employee Attrition"
+output: word_document
+date: "2023-03-02"
+---
+
+```{r}
+install.packages("rsdmx")
+install.packages("dplyr")
+library(ggplot2)
+library(rsdmx)
+library(dplyr)
+
+```
+
+```{r}
+df <- read.csv("C:/Users/Aishat/Downloads/IBM-HR-Employee-Attrition.csv")
+head(df)
+```
+
+```{r}
+is.data.frame(df)
+dim(df)
+```
+# Original Data Structure
+```{r}
+str(df)
+
+```
+```{r}
+colnames(df)
+```
+
+# Data Cleaning
+```{r}
+df <- df %>% rename(Age = ï..Age)
+
+```
+
+```{r}
+# creating a new variable 'age_group' based on the 'Age' variable
+df$age_group <- ifelse(df$Age < 30, 'Young',
+                         ifelse(df$Age >= 30 & df$Age < 60, 'Middle Aged', 'Senior'))
+
+```
+
+```{r}
+df$Education <- as.factor(df$Education)
+df$Attrition <- as.factor(df$Attrition)
+df$BusinessTravel <- as.factor(df$BusinessTravel)
+df$Department <- as.factor(df$Department)
+df$EducationField <- as.factor(df$EducationField)
+df$Gender <- as.factor(df$Gender)
+df$JobInvolvement <- as.factor(df$JobInvolvement)
+df$JobLevel <- as.factor(df$JobLevel)
+df$JobRole <- as.factor(df$JobRole)
+df$JobSatisfaction <- as.factor(df$JobSatisfaction)
+df$MaritalStatus <- as.factor(df$MaritalStatus)
+df$PerformanceRating <- as.factor(df$PerformanceRating)
+df$RelationshipSatisfaction <- as.factor(df$RelationshipSatisfaction)
+df$age_group <- as.factor(df$age_group)
+
+```
+
+```{r}
+df <- df[-c(22, 27, 4, 9, 10, 11, 13)]
+
+```
+
+# Handling missing values
+```{r}
+df <- df[complete.cases(df), ]
+df[is.na(df)] <- sapply(df, function(x) ifelse(is.numeric(x), median(x, na.rm = TRUE), x))
+
+```
+
+# Cleaned Dataset
+
+```{r}
+colSums(sapply(df, is.na))
+```
+```{r}
+str(df)
+```
+```{r}
+head(df)
+```
+
+```{r}
+summary(df)
+```
+# Data Analysis
+
+
+```{r}
+summary(select(df, Age, Education, TotalWorkingYears, YearsAtCompany))
+
+```
+
+```{r}
+aggregate(df[, 1], list(df$age_group), mean)
+
+```
+
+```{r}
+ggplot (df, aes(x = age_group)) + ggtitle("Age Group Distribution of Employee") + xlab("Age") + geom_bar(aes(y = 100 *(..count..)/sum(..count..)), width = 0.25, fill = "steelblue") + ylab("percentage") + theme_minimal()
+
+```
+
+```{r}
+aggregate(df[, 1], list(df$Gender), mean)
+
+```
+
+
+```{r}
+ggplot (df, aes(x = Gender)) + ggtitle("Gender Distribution of Employee") + xlab("gender") + geom_bar(aes(y = 100 *(..count..)/sum(..count..)), width = 0.25, fill = "orchid") + ylab("percentage") + theme_minimal()
+
+```
+
+```{r}
+table(df$Attrition)
+```
+
+```{r}
+library(plotly)
+
+fig <- plot_ly(df, labels = ~Attrition, type = "pie")
+
+fig <- fig %>% layout(title = "Attrition")
+fig
+
+```
+
+```{r}
+ggplot(data=df, mapping=aes(x=Age, fill = Gender)) +geom_density(position="stack")
+
+```
+
+
+```{r}
+table(df$Gender, df$age_group)
+
+```
+
+```{r}
+table(df$Attrition, df$age_group)
+
+```
+
+
+```{r}
+ggplot(df, mapping = aes(x=Attrition, fill =age_group)) + geom_bar (color = "white", position = "dodge")
+
+```
+
+```{r}
+df$YearsAtCompanyGrouped<- cut(df$YearsAtCompany, breaks = seq(0, 40, by = 5))
+df1 <- na.omit(df)
+
+ggplot(filter(df, Attrition == "Yes"), mapping = aes(x = Attrition)) + geom_bar() + facet_wrap(~YearsAtCompanyGrouped) + labs(title = "Employee Attrition based on Years at Company", caption = "Figure 1.1")
+
+```
+
+```{r}
+numeric1 <- select_if(df, is.numeric)
+cor(numeric1)
+
+```
+
+```{r}
+library(ggcorrplot)
+ab <- cor(numeric1)
+ggcorrplot(ab, hc.order =TRUE, 
+           type ="lower", lab =TRUE)
+
+```
+
+```{r}
+plot(df$YearsAtCompany, df$YearsWithCurrManager, main ="YearsAtCompany Vs YearsWithCurrManager", xlab = "YearsWithCurrManager", ylab = " YearsAtCompany", col = "steelblue")
+
+```
+
+```{r}
+ggplot(df, aes(x = YearsWithCurrManager, y = YearsAtCompany, fill = factor(YearsWithCurrManager))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "YearsAtCompany Vs YearsWithCurrManager", x = "YearsWithCurrManager", y = "YearsAtCompany", fill = "YearsWithCurrManager") +
+  scale_fill_discrete(name = "YearsWithCurrManager") +
+  theme(legend.position = "bottom")
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+
+```
+
